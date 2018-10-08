@@ -56,7 +56,8 @@ namespace CS2T3
                 new MenuItem() { Id = 3, Name = "Sukunimen työntekijät" },
                 new MenuItem() { Id = 4, Name = "Osastojen isoimmat palkat" },
                 new MenuItem() { Id = 5, Name = "Viisi yleisintä sukunimeä" },
-                new MenuItem() { Id = 6, Name = "Osastojen ikäjakaumat" }
+                new MenuItem() { Id = 6, Name = "Osastojen ikäjakaumat" },
+                new MenuItem() { Id = 7, Name = "Kymmenen kovapalkkaisinta alle 30-vuotiasta!"}
             };
 
             Menu[0].ItemSelected += (obj, a) =>
@@ -120,8 +121,7 @@ namespace CS2T3
                 })
                 .OrderByDescending(e => e.Lkm)
                 .Take(5)
-                .ToList()
-                ;
+                .ToList();
 
                 WriteResult(a.ItemId, result);
             };
@@ -135,9 +135,28 @@ namespace CS2T3
                     Osasto = d.Name,
                     Alle30v = d.Employees.Where(e => e.Age < 30).Count(),
                     Välillä30_50v = d.Employees.Where(e => 30 >= e.Age && e.Age <= 50).Count(),
-                    Yli50v = d.Employees.Where(e=> e.Age > 50).Count()
+                    Yli50v = d.Employees.Where(e => e.Age > 50).Count()
                 })
                 .ToList();
+                WriteResult(a.ItemId, result);
+            };
+            Menu[6].ItemSelected += (obj, a) =>
+            {
+                // 10 suurinta palkkaa alle 30-v
+                var result = Data.Employees
+                .Select(e =>
+                new
+                {
+                    Nimi = e.Name,
+                    Ikä = e.Age,
+                    Palkka = e.Salary,
+                    Osasto = e.Department
+                })
+                .Where(e => e.Ikä < 30)
+                .OrderByDescending(e => e.Palkka)
+                .Take(10)
+                .ToList();
+
                 WriteResult(a.ItemId, result);
             };
         }
@@ -157,7 +176,7 @@ namespace CS2T3
                 WriteLine(m.ToString());
             }
             // FUTUR PRUF eli listan Menu sisältämien olioiden korkein Id arvo
-            return Syote.KokonaislukuPakoittaen("Valitse (0 = lopetus):", 0, Menu.Max(x => x.Id));
+            return Syote.KokonaislukuPakoittaen("Valitse (0 = lopetus): ", 0, Menu.Max(x => x.Id));
         }
 
         public static void Run()

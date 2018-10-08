@@ -3,8 +3,8 @@ using System.Linq;
 using static System.Console;
 using System.Reflection;
 
-// Janne Rajuvaara & Hans Nieminen (WriteResult algoritmi)
-// NTK17SP / SAMK
+// Janne Rajuvaara 
+// NTK17SP 
 
 namespace CS2T3
 {
@@ -14,36 +14,7 @@ namespace CS2T3
 
         static void WriteResult<T>(int itemid, List<T> result)
         {
-            string row;
-            //otsikkorivit
-            WriteLine();
-            WriteLine(Menu.Where(mi => mi.Id == itemid).First().Name.ToUpper());
-            WriteLine("‐".PadRight(18 * result[0].GetType().GetProperties().Length + 2, '‐'));
-            //sarakeotsikkorivit
-            if (result.Count > 0)
-            {
-                row = "";
-                foreach (PropertyInfo property in result[0].GetType().GetProperties())
-                {
-                    row += $"{property.Name}".PadRight(16) + " | ";
-                }
-                WriteLine(row);
-            }
-            WriteLine("‐".PadRight(18 * result[0].GetType().GetProperties().Length + 2, '‐'));
-            //datarivit
-            foreach (object item in result)
-            {
-                row = "";
-                foreach (PropertyInfo property in item.GetType().GetProperties())
-                {
-                    row += $"{property.GetValue(item, null).ToString()}".PadRight(16) + " | ";
-                }
-                WriteLine(row);
-            }
-            WriteLine("‐".PadRight(18 * result[0].GetType().GetProperties().Length + 2, '‐'));
-            WriteLine();
-            Write("Paina Enter jatkaaksesi.");
-            ReadLine();
+            // omitted
         }
 
         static void InitializeMenu()

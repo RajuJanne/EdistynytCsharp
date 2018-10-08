@@ -48,23 +48,98 @@ namespace CS2T3
 
         static void InitializeMenu()
         {
-            MenuItem m1 = new MenuItem() { Id = 1, Name = "50-vuotiaat työntekijät"};
-            MenuItem m2 = new MenuItem() { Id = 2, Name = "Osastot yli 50 henkilöä" };
-            MenuItem m3 = new MenuItem() { Id = 3, Name = "Sukunimen työntekijät" };
-            MenuItem m4 = new MenuItem() { Id = 4, Name = "Osastojen isoimmat palkat" };
-            MenuItem m5 = new MenuItem() { Id = 5, Name = "Viisi yleisintä sukunimeä" };
-            MenuItem m6 = new MenuItem() { Id = 6, Name = "Osastojen ikäjakaumat" };
 
             Menu = new List<MenuItem>()
             {
-                m1,m2,m3,m4,m5,m6
+                new MenuItem() { Id = 1, Name = "50-vuotiaat työntekijät"},
+                new MenuItem() { Id = 2, Name = "Osastot yli 50 henkilöä" },
+                new MenuItem() { Id = 3, Name = "Sukunimen työntekijät" },
+                new MenuItem() { Id = 4, Name = "Osastojen isoimmat palkat" },
+                new MenuItem() { Id = 5, Name = "Viisi yleisintä sukunimeä" },
+                new MenuItem() { Id = 6, Name = "Osastojen ikäjakaumat" }
             };
 
-        }
+            Menu[0].ItemSelected += (obj, a) =>
+            {
+                var result = Data.Employees
+                .Where(e => e.Age == 50)
+                .Select(e => e).ToList();
+                WriteResult(a.ItemId, result);
+            };
 
-        static void m1_selected(object sender, MenuItemEventArgs e)
-        {
-            throw new System.NotImplementedException();
+            Menu[1].ItemSelected += (obj, a) =>
+            {
+                var result = Data.Departments
+                .Where(d => d.EmployeeCount > 50)
+                .Select(d => new {
+                    Id = d.Id,
+                    Nimi = d.Name,
+                    Vahvuus = d.EmployeeCount
+                }).ToList();
+                WriteResult(a.ItemId, result);
+            };
+            Menu[2].ItemSelected += (obj, a) =>
+            {
+                string ss = Syote.Merkkijono("Anna sukunimi: ");
+                var result = Data.Employees
+                .Where(e => e.LastName == ss)
+                .Select(e => new
+                {
+                    Id = e.Id,
+                    Nimi = e.Name
+                }).ToList();
+                WriteResult(a.ItemId, result);
+            };
+            Menu[3].ItemSelected += (obj, a) =>
+            {
+                // isoimmat palkat
+                var result = Data.Departments.SelectMany(d => d.Employees,
+                (d, e) => new
+                {
+                    Osasto = d.Name,
+                    Palkka = e.Salary
+                })
+                .GroupBy(x => x.Osasto)
+                .Select(y => new
+                {
+                    Osasto = y.Key,
+                    Palkka = y.Max(x => x.Palkka)
+                }
+                ).ToList();
+                WriteResult(a.ItemId, result);
+            };
+            Menu[4].ItemSelected += (obj, a) =>
+            {
+                //5 yleisintä sukunimeä
+                var result = Data.Employees
+                .GroupBy(e => e.LastName)
+                .Select(e => new
+                {
+                    Sukunimi = e.Key,
+                    Lkm = e.Count()
+                })
+                .OrderByDescending(e => e.Lkm)
+                .Take(5)
+                .ToList()
+                ;
+
+                WriteResult(a.ItemId, result);
+            };
+            Menu[5].ItemSelected += (obj, a) =>
+            {
+                // osastojen ikäjakauma alle 30, 30 - 50, yli 50
+                var result = Data.Departments
+                .Select(d
+                => new
+                {
+                    Osasto = d.Name,
+                    Alle30v = d.Employees.Where(e => e.Age < 30).Count(),
+                    Välillä30_50v = d.Employees.Where(e => 30 >= e.Age && e.Age <= 50).Count(),
+                    Yli50v = d.Employees.Where(e=> e.Age > 50).Count()
+                })
+                .ToList();
+                WriteResult(a.ItemId, result);
+            };
         }
 
         static void Initialize()
@@ -89,11 +164,13 @@ namespace CS2T3
         {
             Initialize();
             int selection = -1;
-            do
+            while (selection != 0)
             {
                 selection = ReadFromMenu();
-                Menu.Select(x => x.Id = selection);
-            } while (selection != 0);
+                // huomioi kynkäältä tarttuneet pahat tavat
+                if (selection != 0) Menu[selection - 1].Select();
+                else break;
+            }
         }
     }
 }

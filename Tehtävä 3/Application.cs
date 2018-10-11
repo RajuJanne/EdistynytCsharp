@@ -28,14 +28,15 @@ namespace CS2T3
                 new MenuItem() { Id = 4, Name = "Osastojen isoimmat palkat" },
                 new MenuItem() { Id = 5, Name = "Viisi yleisintä sukunimeä" },
                 new MenuItem() { Id = 6, Name = "Osastojen ikäjakaumat" },
-                new MenuItem() { Id = 7, Name = "Kymmenen kovapalkkaisinta alle 30-vuotiasta!"}
+                new MenuItem() { Id = 7, Name = "Kymmenen kovapalkkaisinta alle 30-vuotiasta"}
             };
 
             Menu[0].ItemSelected += (obj, a) =>
             {
                 var result = Data.Employees
                 .Where(e => e.Age == 50)
-                .Select(e => e).ToList();
+                .ToList();
+
                 WriteResult(a.ItemId, result);
             };
 
@@ -44,10 +45,11 @@ namespace CS2T3
                 var result = Data.Departments
                 .Where(d => d.EmployeeCount > 50)
                 .Select(d => new {
-                    Id = d.Id,
+                    d.Id,
                     Nimi = d.Name,
                     Vahvuus = d.EmployeeCount
                 }).ToList();
+
                 WriteResult(a.ItemId, result);
             };
             Menu[2].ItemSelected += (obj, a) =>
@@ -57,9 +59,10 @@ namespace CS2T3
                 .Where(e => e.LastName == ss)
                 .Select(e => new
                 {
-                    Id = e.Id,
+                    e.Id,
                     Nimi = e.Name
                 }).ToList();
+
                 WriteResult(a.ItemId, result);
             };
             Menu[3].ItemSelected += (obj, a) =>
@@ -78,6 +81,7 @@ namespace CS2T3
                     Palkka = y.Max(x => x.Palkka)
                 }
                 ).ToList();
+
                 WriteResult(a.ItemId, result);
             };
             Menu[4].ItemSelected += (obj, a) =>
@@ -109,6 +113,7 @@ namespace CS2T3
                     Yli50v = d.Employees.Where(e => e.Age > 50).Count()
                 })
                 .ToList();
+
                 WriteResult(a.ItemId, result);
             };
             Menu[6].ItemSelected += (obj, a) =>
